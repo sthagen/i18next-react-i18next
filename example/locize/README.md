@@ -10,7 +10,7 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 ## using with locize
 
-We added our translation management [locize.com](http://locize.com).
+We added our translation management [locize.com](https://www.locize.com?utm_source=react_i18next_locize_readme&utm_medium=github&utm_campaign=example_locize_readme).
 
 InContext Editing:
 
