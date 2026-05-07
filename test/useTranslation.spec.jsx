@@ -151,6 +151,36 @@ describe('useTranslation', () => {
 
       expect(t('key1')).toBe('key1');
     });
+
+    // Hook is bound to its full namespace list via getFixedT's `scopeNs` opt
+    // (i18next ≥ 26.0.10). Resolution scope is unchanged (still primary-only
+    // outside `nsMode: 'fallback'`); only the selector path[0] check sees the
+    // secondary namespaces, so `$ => $.secondaryNs.foo` routes correctly.
+    describe('selector with secondary namespace prefix (no nsMode: fallback)', () => {
+      it('should resolve a selector path whose first segment is a secondary namespace', () => {
+        const { result } = renderHook(() =>
+          useTranslation(['translation', 'other'], { i18n: i18nInstance }),
+        );
+        const { t } = result.current;
+
+        // 'transTest1' exists in both namespaces with different values.
+        // Selector with explicit secondary-ns prefix must resolve to `other`.
+        expect(t(($) => $.other.transTest1)).toBe('Another go <1>there</1>.');
+        // No prefix → still resolved against primary ns.
+        expect(t(($) => $.transTest1)).toBe('Go <1>there</1>.');
+      });
+
+      it('should keep non-selector resolution isolated to the primary ns', () => {
+        // Defends against accidentally turning every t() into a fallback chain.
+        const { result } = renderHook(() =>
+          useTranslation(['translation', 'other'], { i18n: i18nInstance }),
+        );
+        const { t } = result.current;
+
+        // 'nestedKey2' only exists in `other`. Default mode must NOT find it.
+        expect(t('nestedKey2')).toBe('nestedKey2');
+      });
+    });
   });
 
   describe('default namespace from context', () => {
